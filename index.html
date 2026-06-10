@@ -35,143 +35,98 @@
     50% { transform: translateY(-20px) rotate(5deg); }
   }
 
-  /* 卡片 - 加大尺寸防止内容拥挤 */
+  /* 直接显示结果卡片 - 无翻牌 */
   .card-wrap {
-    perspective: 1500px;
     width: 320px;
-    height: 480px;
+    height: 460px;
     margin: 12px 0;
   }
   .card {
-    position: relative;
     width: 100%;
     height: 100%;
-    transition: transform 0.9s cubic-bezier(0.4, 0.0, 0.2, 1);
-    transform-style: preserve-3d;
-    cursor: pointer;
-  }
-  .card.flipped { transform: rotateY(180deg); }
-
-  .face {
-    position: absolute;
-    inset: 0;
+    background: #fffaf0;
     border-radius: 24px;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
     overflow: hidden;
     box-shadow: 0 20px 50px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.08);
-  }
-
-  /* 封面（等待触碰状态） */
-  .back {
-    background: #ffffff;
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: column;
+    align-items: center;
+    padding: 28px 22px;
   }
-  .back .pattern {
+
+  /* 顶部品牌 */
+  .brand {
     position: absolute;
-    inset: 0;
-    opacity: 0.5;
-  }
-  .back .badge {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background: #ffd6a5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 56px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-    z-index: 1;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-  }
-  .back .title {
-    margin-top: 28px;
-    font-size: 24px;
-    font-weight: 600;
-    color: #5b3a3a;
-    z-index: 1;
-    letter-spacing: 2px;
-  }
-  .back .sub {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #a87b7b;
-    z-index: 1;
-  }
-  .back .nfc-icon {
-    margin-top: 24px;
-    font-size: 28px;
-    z-index: 1;
-    animation: nfc-bounce 1.5s ease-in-out infinite;
-  }
-  @keyframes nfc-bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: rgba(91, 58, 58, 0.7);
+    font-weight: 300;
   }
 
-  /* 卡片正面（结果页） - 用 grid 三段式布局 */
-  .front {
-    background: #fffaf0;
-    transform: rotateY(180deg);
-    padding: 24px 22px;
-    display: grid;
-    grid-template-rows: auto 1fr auto auto;
-    gap: 14px;
-    align-items: center;
-    justify-items: center;
-  }
-  .front .illus {
-    width: 130px;
-    height: 130px;
+  /* 插画区 - 固定高度 */
+  .illus {
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .front .illus svg { width: 100%; height: 100%; }
+  .illus svg { width: 100%; height: 100%; }
 
-  .front .message {
+  /* 分割线 */
+  .divider {
+    width: 60%;
+    height: 1px;
+    background: #e8d5c4;
+    margin: 18px 0;
+    flex-shrink: 0;
+  }
+
+  /* 寄语 - flex 1 占据中间所有空间 */
+  .message {
+    flex: 1;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    font-size: 19px;
+    font-size: 18px;
     line-height: 1.7;
     color: #4a3030;
     font-weight: 500;
-    padding: 0 6px;
-    align-self: center;
-    justify-self: center;
+    padding: 0 4px;
+    overflow-y: auto;
   }
 
-  .front .meta {
+  /* 元信息 */
+  .meta {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 12px;
     color: #b89090;
-    padding-top: 10px;
+    padding-top: 12px;
     border-top: 1px dashed #e8d5c4;
+    flex-shrink: 0;
   }
-
-  .front .nfc-id-tag {
+  .nfc-tag {
+    text-align: center;
     font-size: 11px;
     color: #c8a8a8;
-    letter-spacing: 1px;
-    align-self: end;
+    margin-top: 8px;
+    flex-shrink: 0;
   }
 
   /* 操作按钮 */
   .actions {
     display: flex;
     gap: 12px;
-    margin-top: 12px;
+    margin-top: 14px;
   }
   .btn {
     background: rgba(255,255,255,0.85);
@@ -190,24 +145,6 @@
   .btn:active { transform: scale(0.96); }
   .btn.primary { background: #ffd6a5; }
   .btn .icon { margin-right: 6px; }
-
-  .post-actions {
-    display: none;
-    gap: 10px;
-  }
-  .post-actions.show { display: flex; }
-
-  /* 顶部品牌 */
-  .brand {
-    position: absolute;
-    top: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 13px;
-    letter-spacing: 3px;
-    color: rgba(91, 58, 58, 0.7);
-    font-weight: 300;
-  }
 
   /* Toast */
   .toast {
@@ -239,6 +176,15 @@
     color: #8a5a3a;
     white-space: nowrap;
   }
+
+  /* 触摸反馈 */
+  @keyframes pulse-in {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .card {
+    animation: pulse-in 0.5s ease-out;
+  }
 </style>
 </head>
 <body>
@@ -261,47 +207,27 @@
     <path d="M10,25 Q20,10 30,25 Q40,40 50,25" stroke="#fff" stroke-width="2" fill="none" opacity="0.6"/>
   </svg>
 
+  <!-- 直接显示结果卡片，没有翻牌 -->
   <div class="card-wrap">
     <div class="card" id="card">
-      <!-- 封面：等待触碰 -->
-      <div class="face back">
-        <svg class="pattern" viewBox="0 0 320 480" preserveAspectRatio="none">
-          <defs>
-            <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="2" cy="2" r="1" fill="#fde7c5"/>
-            </pattern>
-          </defs>
-          <rect width="320" height="480" fill="url(#dots)"/>
-        </svg>
-        <div class="badge">🌿</div>
-        <div class="title">心情签</div>
-        <div class="sub">触碰 NFC 抽取你的心情</div>
-        <div class="nfc-icon">📱 ⬇</div>
+      <div class="illus" id="illus"></div>
+      <div class="divider"></div>
+      <div class="message" id="message">—</div>
+      <div class="meta">
+        <span id="cardNo">№ —</span>
+        <span id="cardDate">—</span>
       </div>
-
-      <!-- 正面：结果显示 -->
-      <div class="face front" id="frontFace">
-        <div class="illus" id="illus"></div>
-        <div class="message" id="message">—</div>
-        <div class="meta">
-          <span id="cardNo">№ —</span>
-          <span id="cardDate">—</span>
-        </div>
-        <div class="nfc-id-tag" id="nfcTag"></div>
-      </div>
+      <div class="nfc-tag" id="nfcTag">今日抽取</div>
     </div>
   </div>
 
-  <!-- 操作按钮（仅在结果页显示） -->
   <div class="actions">
-    <div class="post-actions" id="postActions">
-      <button class="btn primary" id="saveBtn">
-        <span class="icon">💾</span>保存图片
-      </button>
-      <button class="btn" id="againBtn">
-        <span class="icon">🔄</span>换一张
-      </button>
-    </div>
+    <button class="btn primary" id="againBtn">
+      <span class="icon">🔄</span>换一张
+    </button>
+    <button class="btn" id="saveBtn">
+      <span class="icon">💾</span>保存图片
+    </button>
   </div>
 
   <div class="unsupported" id="unsupported" style="display:none">
@@ -336,50 +262,50 @@ const MOODS = [
   { id: 20, color: ['#ffe8d4','#fff0e0'], icon: '🥐', message: '像刚出炉的可颂，外酥里嫩地活着。', category: '趣味' },
 ];
 
-// 清新系插画 SVG
+// 清新系插画 SVG（无 emoji 依赖，4 种风格）
 function makeIllus(mood) {
   const c1 = mood.color[0], c2 = mood.color[1];
   const icon = mood.icon;
   const styles = [
-    `<svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+    `<svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="g1${mood.id}" cx="50%" cy="50%">
+        <radialGradient id="g${mood.id}" cx="50%" cy="50%">
           <stop offset="0%" stop-color="${c2}"/>
           <stop offset="100%" stop-color="${c1}"/>
         </radialGradient>
       </defs>
-      <circle cx="65" cy="65" r="50" fill="url(#g1${mood.id})" opacity="0.6"/>
-      <circle cx="65" cy="65" r="36" fill="${c2}"/>
-      <text x="65" y="82" text-anchor="middle" font-size="40">${icon}</text>
-      <circle cx="28" cy="36" r="4" fill="${c1}" opacity="0.7"/>
-      <circle cx="102" cy="94" r="6" fill="${c1}" opacity="0.6"/>
-      <circle cx="22" cy="100" r="3" fill="${c1}" opacity="0.5"/>
-      <circle cx="108" cy="28" r="4" fill="${c1}" opacity="0.7"/>
+      <circle cx="70" cy="70" r="55" fill="url(#g${mood.id})" opacity="0.6"/>
+      <circle cx="70" cy="70" r="40" fill="${c2}"/>
+      <text x="70" y="88" text-anchor="middle" font-size="44">${icon}</text>
+      <circle cx="28" cy="38" r="4" fill="${c1}" opacity="0.7"/>
+      <circle cx="112" cy="98" r="6" fill="${c1}" opacity="0.6"/>
+      <circle cx="22" cy="104" r="3" fill="${c1}" opacity="0.5"/>
+      <circle cx="118" cy="30" r="4" fill="${c1}" opacity="0.7"/>
     </svg>`,
-    `<svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
-      <g transform="translate(65,65)">
-        <ellipse cx="0" cy="-28" rx="15" ry="25" fill="${c1}" opacity="0.8"/>
-        <ellipse cx="27" cy="-9" rx="15" ry="25" fill="${c1}" opacity="0.8" transform="rotate(72)"/>
-        <ellipse cx="17" cy="23" rx="15" ry="25" fill="${c1}" opacity="0.8" transform="rotate(144)"/>
-        <ellipse cx="-17" cy="23" rx="15" ry="25" fill="${c1}" opacity="0.8" transform="rotate(216)"/>
-        <ellipse cx="-27" cy="-9" rx="15" ry="25" fill="${c1}" opacity="0.8" transform="rotate(288)"/>
-        <circle cx="0" cy="0" r="15" fill="${c2}"/>
-        <text x="0" y="6" text-anchor="middle" font-size="16">${icon}</text>
+    `<svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(70,70)">
+        <ellipse cx="0" cy="-32" rx="16" ry="28" fill="${c1}" opacity="0.8"/>
+        <ellipse cx="30" cy="-10" rx="16" ry="28" fill="${c1}" opacity="0.8" transform="rotate(72)"/>
+        <ellipse cx="19" cy="26" rx="16" ry="28" fill="${c1}" opacity="0.8" transform="rotate(144)"/>
+        <ellipse cx="-19" cy="26" rx="16" ry="28" fill="${c1}" opacity="0.8" transform="rotate(216)"/>
+        <ellipse cx="-30" cy="-10" rx="16" ry="28" fill="${c1}" opacity="0.8" transform="rotate(288)"/>
+        <circle cx="0" cy="0" r="16" fill="${c2}"/>
+        <text x="0" y="7" text-anchor="middle" font-size="18">${icon}</text>
       </g>
     </svg>`,
-    `<svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="100" cy="36" r="20" fill="${c1}" opacity="0.8"/>
-      <text x="100" y="44" text-anchor="middle" font-size="16">${icon}</text>
-      <path d="M0,100 Q28,65 56,86 T130,80 L130,130 L0,130 Z" fill="${c1}" opacity="0.6"/>
-      <path d="M0,115 Q35,95 70,108 T130,105 L130,130 L0,130 Z" fill="${c1}" opacity="0.9"/>
-      <ellipse cx="28" cy="40" rx="16" ry="6" fill="${c2}" opacity="0.7"/>
-      <ellipse cx="64" cy="26" rx="13" ry="4" fill="${c2}" opacity="0.6"/>
+    `<svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="108" cy="38" r="22" fill="${c1}" opacity="0.8"/>
+      <text x="108" y="48" text-anchor="middle" font-size="18">${icon}</text>
+      <path d="M0,108 Q32,70 64,92 T140,86 L140,140 L0,140 Z" fill="${c1}" opacity="0.6"/>
+      <path d="M0,124 Q40,100 80,116 T140,112 L140,140 L0,140 Z" fill="${c1}" opacity="0.9"/>
+      <ellipse cx="30" cy="44" rx="18" ry="6" fill="${c2}" opacity="0.7"/>
+      <ellipse cx="70" cy="28" rx="14" ry="5" fill="${c2}" opacity="0.6"/>
     </svg>`,
-    `<svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="42" cy="50" r="28" fill="${c1}" opacity="0.7"/>
-      <circle cx="86" cy="72" r="34" fill="${c2}" opacity="0.7"/>
-      <circle cx="36" cy="92" r="20" fill="${c1}" opacity="0.5"/>
-      <text x="65" y="76" text-anchor="middle" font-size="32">${icon}</text>
+    `<svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="46" cy="54" r="30" fill="${c1}" opacity="0.7"/>
+      <circle cx="94" cy="78" r="38" fill="${c2}" opacity="0.7"/>
+      <circle cx="40" cy="100" r="22" fill="${c1}" opacity="0.5"/>
+      <text x="70" y="84" text-anchor="middle" font-size="36">${icon}</text>
     </svg>`,
   ];
   return styles[mood.id % styles.length];
@@ -401,8 +327,7 @@ function hashCode(str) {
 
 function pickCard(seedId) {
   if (seedId) {
-    const idx = Math.abs(hashCode(seedId)) % MOODS.length;
-    return MOODS[idx];
+    return MOODS[Math.abs(hashCode(seedId)) % MOODS.length];
   }
   return MOODS[Math.floor(Math.random() * MOODS.length)];
 }
@@ -415,67 +340,29 @@ function formatDate(d) {
   return `${m}月${day}日 ${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
 }
 
-function revealCard(card, seedId) {
+function renderCard(card, seedId) {
   currentCard = card;
   nfcId = seedId;
+  document.getElementById('illus').innerHTML = makeIllus(card);
+  document.getElementById('message').textContent = card.message;
+  document.getElementById('cardNo').textContent = '№ ' + String(card.id).padStart(3, '0');
+  document.getElementById('cardDate').textContent = formatDate(new Date());
+  document.getElementById('nfcTag').textContent = seedId ? `NFC · ${seedId.slice(0, 8)}` : '今日抽取';
 
-  // 翻牌
-  document.getElementById('card').classList.add('flipped');
-  playFlipSound();
-  if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-
-  // 翻牌过程中填好正面内容（动画到一半时换）
-  setTimeout(() => {
-    document.getElementById('illus').innerHTML = makeIllus(card);
-    document.getElementById('message').textContent = card.message;
-    document.getElementById('cardNo').textContent = '№ ' + String(card.id).padStart(3, '0');
-    document.getElementById('cardDate').textContent = formatDate(new Date());
-    document.getElementById('nfcTag').textContent = seedId ? `NFC · ${seedId.slice(0, 8)}` : '今日抽取';
-    document.getElementById('postActions').classList.add('show');
-  }, 450);
+  // 重新触发动画
+  const cardEl = document.getElementById('card');
+  cardEl.style.animation = 'none';
+  cardEl.offsetHeight;
+  cardEl.style.animation = 'pulse-in 0.5s ease-out';
 }
 
-function resetCard() {
-  document.getElementById('card').classList.remove('flipped');
-  document.getElementById('postActions').classList.remove('show');
-  currentCard = null;
-}
-
-// ===================== 翻牌音效 =====================
+// ===================== 音效 =====================
 let audioCtx = null;
 function getAudio() {
   if (!audioCtx) {
     try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
   }
   return audioCtx;
-}
-
-function playFlipSound() {
-  const ctx = getAudio();
-  if (!ctx) return;
-  const now = ctx.currentTime;
-  // 翻牌：清脆的"刷"
-  const o1 = ctx.createOscillator();
-  const g1 = ctx.createGain();
-  o1.type = 'triangle';
-  o1.frequency.setValueAtTime(800, now);
-  o1.frequency.exponentialRampToValueAtTime(200, now + 0.15);
-  g1.gain.setValueAtTime(0.15, now);
-  g1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-  o1.connect(g1).connect(ctx.destination);
-  o1.start(now);
-  o1.stop(now + 0.2);
-  // 落牌：低沉的"咚"
-  const o2 = ctx.createOscillator();
-  const g2 = ctx.createGain();
-  o2.type = 'sine';
-  o2.frequency.setValueAtTime(120, now + 0.18);
-  g2.gain.setValueAtTime(0.0, now + 0.15);
-  g2.gain.linearRampToValueAtTime(0.2, now + 0.22);
-  g2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-  o2.connect(g2).connect(ctx.destination);
-  o2.start(now + 0.15);
-  o2.stop(now + 0.5);
 }
 
 function playShimmer() {
@@ -512,14 +399,12 @@ function saveAsImage() {
   canvas.height = 1080;
   const ctx = canvas.getContext('2d');
 
-  // 背景渐变
   const grad = ctx.createLinearGradient(0, 0, 720, 1080);
   grad.addColorStop(0, currentCard.color[1]);
   grad.addColorStop(1, currentCard.color[0]);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 720, 1080);
 
-  // 卡纸
   const m = 40, cw = 720 - m * 2, ch = 1080 - m * 2;
   drawRoundRect(ctx, m, m, cw, ch, 40);
   ctx.fillStyle = '#fffaf0';
@@ -528,6 +413,12 @@ function saveAsImage() {
   ctx.lineWidth = 4;
   drawRoundRect(ctx, m + 12, m + 12, cw - 24, ch - 24, 32);
   ctx.stroke();
+
+  // 顶部品牌
+  ctx.fillStyle = 'rgba(91,58,58,0.5)';
+  ctx.font = '22px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('✦ MOOD · CARD ✦', 360, 130);
 
   // 插画
   ctx.fillStyle = currentCard.color[0];
@@ -539,7 +430,6 @@ function saveAsImage() {
   ctx.arc(360, 280, 48, 0, Math.PI * 2);
   ctx.fill();
   ctx.font = '54px serif';
-  ctx.textAlign = 'center';
   ctx.fillText(currentCard.icon, 360, 302);
 
   // 分割线
@@ -547,15 +437,15 @@ function saveAsImage() {
   ctx.lineWidth = 2;
   ctx.setLineDash([8, 8]);
   ctx.beginPath();
-  ctx.moveTo(120, 460);
-  ctx.lineTo(600, 460);
+  ctx.moveTo(120, 440);
+  ctx.lineTo(600, 440);
   ctx.stroke();
   ctx.setLineDash([]);
 
   // 寄语
   ctx.fillStyle = '#4a3030';
   ctx.font = '32px -apple-system, "PingFang SC", sans-serif';
-  wrapText(ctx, currentCard.message, 360, 560, 540, 50);
+  wrapText(ctx, currentCard.message, 360, 540, 540, 50);
 
   // 元信息
   ctx.fillStyle = '#b89090';
@@ -564,12 +454,6 @@ function saveAsImage() {
   ctx.fillText('№ ' + String(currentCard.id).padStart(3, '0'), 100, 920);
   ctx.textAlign = 'right';
   ctx.fillText(formatDate(new Date()), 620, 920);
-
-  // 品牌
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(91,58,58,0.5)';
-  ctx.font = '18px -apple-system, sans-serif';
-  ctx.fillText('✦ MOOD · CARD ✦', 360, 980);
 
   canvas.toBlob(blob => {
     const url = URL.createObjectURL(blob);
@@ -613,7 +497,7 @@ function wrapText(ctx, text, x, y, maxW, lineH) {
   if (line) ctx.fillText(line, x, yy);
 }
 
-// ===================== NFC 监听 =====================
+// ===================== NFC =====================
 async function startNFC() {
   if (!('NDEFReader' in window)) {
     document.getElementById('unsupported').style.display = 'block';
@@ -629,44 +513,37 @@ async function startNFC() {
 }
 
 function onNFCRead({ serialNumber }) {
-  // 触碰直接抽卡 + 翻牌 + 出结果（不需要先点按钮）
   const seedId = serialNumber || ('nfc-' + Date.now());
-  playShimmer();
-  // 用户系统音效解锁（iOS 需要）
   getAudio();
   const card = pickCard(seedId);
-  revealCard(card, seedId);
+  renderCard(card, seedId);
+  playShimmer();
+  if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 }
 
 // ===================== 事件 =====================
 document.getElementById('saveBtn').addEventListener('click', saveAsImage);
 document.getElementById('againBtn').addEventListener('click', () => {
-  resetCard();
-  // 0.6s 后重抽（如果还在 NFC 范围内会再次触发 onNFCRead）
-  setTimeout(() => {
-    if (!currentCard) {
-      const card = pickCard(nfcId);
-      revealCard(card, nfcId);
-      playShimmer();
-    }
-  }, 600);
+  getAudio();
+  playShimmer();
+  const card = pickCard(nfcId);
+  renderCard(card, nfcId);
 });
 
-// 点卡片本体：未抽时随机抽一张；已抽时收起
+// 点卡片本身换一张
 document.getElementById('card').addEventListener('click', () => {
-  if (currentCard) {
-    resetCard();
-  } else {
-    getAudio(); // 解锁音频
-    playShimmer();
-    const card = pickCard(null);
-    revealCard(card, null);
-  }
+  getAudio();
+  playShimmer();
+  const card = pickCard(nfcId);
+  renderCard(card, nfcId);
 });
 
-// ===================== 启动 =====================
+// ===================== 启动：直接显示一张随机卡 =====================
 window.addEventListener('load', () => {
   startNFC();
+  // 立即显示一张随机卡（没有封面/等待页）
+  const card = pickCard(null);
+  renderCard(card, null);
 });
 </script>
 </body>
