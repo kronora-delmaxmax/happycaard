@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>心情签 · Mood Card</title>
+
+<!-- 预连接：建立 TLS 握手，比首次请求快 100-300ms -->
+<link rel="preconnect" href="https://kronora-delmaxmax.github.io" crossorigin>
+<link rel="dns-prefetch" href="https://kronora-delmaxmax.github.io">
+
 <style>
  * { margin:0; padding:0; box-sizing: border-box; }
  html, body {
@@ -45,10 +50,9 @@
  flex-direction: column;
  align-items: center;
  padding:24px 22px 20px;
- animation: pulse-in 0.6s ease-out;
+ animation: pulse-in 0.5s ease-out;
  position: relative;
  }
- /* 插画区 */
  .illus {
  width:240px;
  height:240px;
@@ -64,20 +68,11 @@
  height:100%;
  object-fit: cover;
  display: block;
- transition: opacity 0.4s ease;
+ opacity:0;
+ transition: opacity 0.25s ease;
+ will-change: opacity;
  }
- .illus.loading::after {
- content:'';
- position:absolute;
- inset:0;
- background: linear-gradient(90deg, #f0e0d0 25%, #f8f0e3 50%, #f0e0d0 75%);
- background-size:200% 100%;
- animation: shimmer 1.4s infinite;
- }
- @keyframes shimmer {
- 0% { background-position:200% 0; }
- 100% { background-position:-200% 0; }
- }
+ .illus img.ready { opacity:1; }
  .divider {
  width:60%;
  height:1px;
@@ -155,7 +150,6 @@
  0% { transform: scale(0.95); opacity:0; }
  100% { transform: scale(1); opacity:1; }
  }
- /* NFC 触发时整卡轻微脉动 */
  .card.tap-pulse { animation: tap-pulse 0.6s ease-out; }
  @keyframes tap-pulse {
  0% { transform: scale(1); }
@@ -171,7 +165,7 @@
 
  <div class="card-wrap">
  <div class="card" id="card">
- <div class="illus loading" id="illus"><img id="illusImg" alt=""></div>
+ <div class="illus" id="illus"><img id="illusImg" alt="" decoding="async" fetchpriority="high"></div>
  <div class="divider"></div>
  <div class="message" id="message">—</div>
  <div class="meta">
@@ -196,50 +190,17 @@
 
 <script>
 /* =====================================================
- * 30 张 Ji Yong Park 风格插画（CDN 公开地址）
- * 主题分类：喜悦5 / 治愈5 / 力量5 / 哲思5 / 趣味5 / 静谧5
+ * 30 张本地压缩插画（600px JPEG，~140KB/张，总 4.2MB）
+ * 路径：images/illus-01.jpg ~ images/illus-30.jpg
+ * GitHub Pages 同源 + 浏览器 HTTP 缓存 + 预热，切卡秒切
  * ===================================================== */
-const ILLUS = {
- // 喜悦
- 1:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079320_797d23ac.png",
- 2:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079324_b16b9816.png",
- 3:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079321_bd8e0eed.png",
- 4:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079361_ed43827f.png",
- 5:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079366_ddfec3b9.png",
- // 治愈
- 6:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079373_6216110d.png",
- 7:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079396_958bf189.png",
- 8:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079406_20e5af90.png",
- 9:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079408_c25713f1.png",
- 10: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079439_d68893d4.png",
- // 力量
- 11: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079511_3ff39778.png",
- 12: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079507_00954e2f.png",
- 13: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079509_585afc86.png",
- 14: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079542_33ad64f5.png",
- 15: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079548_4b62695d.png",
- // 哲思
- 16: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079550_f46e76be.png",
- 17: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079586_6445678d.png",
- 18: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079589_15af26d3.png",
- 19: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079604_6025f807.png",
- 20: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079622_52c6783c.png",
- // 趣味
- 21: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079696_e5ae43ef.png",
- 22: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079698_f0db5984.png",
- 23: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079697_2c85760a.png",
- 24: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079733_4a3aefd0.png",
- 25: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079734_09e0a6ab.png",
- // 静谧
- 26: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079754_e5c62b75.png",
- 27: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079769_7304471e.png",
- 28: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079773_4d32b05e.png",
- 29: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079796_3b39062e.png",
- 30: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079818_0e357a54.png",
-};
+const ILLUS = [];
+for (let i = 1; i <= 30; i++) {
+ ILLUS.push(`images/illus-${String(i).padStart(2,'0')}.jpg`);
+}
 
 /* =====================================================
- * 20 张心情签数据（每张配 1 张精选插画）
+ * 20 张心情签数据
  * ===================================================== */
 const MOODS = [
  { id:1,  illus:1,  color:['#ffd6a5','#fff5d6'], message:'今天的你，像清晨第一缕光，刚刚好。', category:'喜悦' },
@@ -295,17 +256,16 @@ function renderCard(card, seedId, withTapPulse) {
 
  const img = document.getElementById('illusImg');
  const illus = document.getElementById('illus');
- illus.classList.add('loading');
- img.style.opacity = '0';
- img.src = ILLUS[card.illus];
- img.onload = () => {
- img.style.opacity = '1';
- illus.classList.remove('loading');
- };
- img.onerror = () => {
- illus.classList.remove('loading');
- img.style.opacity = '1';
- };
+ img.classList.remove('ready');
+ const src = ILLUS[card.illus - 1];
+ if (img.src.endsWith(src) && img.complete && img.naturalWidth > 0) {
+ // 同一张图已加载，直接显示
+ img.classList.add('ready');
+ } else {
+ img.src = src;
+ }
+ img.onload = () => img.classList.add('ready');
+ img.onerror = () => img.classList.add('ready'); // 失败也显示，别卡白屏
 
  document.getElementById('message').textContent = card.message;
  document.getElementById('cardNo').textContent = '№ ' + String(card.id).padStart(3, '0');
@@ -320,9 +280,22 @@ function renderCard(card, seedId, withTapPulse) {
  } else if (isFirstRender) {
  cardEl.style.animation = 'none';
  void cardEl.offsetWidth;
- cardEl.style.animation = 'pulse-in 0.6s ease-out';
+ cardEl.style.animation = 'pulse-in 0.5s ease-out';
  isFirstRender = false;
  }
+}
+
+/* ===================== 预热：空闲时静默加载所有插画 ===================== */
+function warmup() {
+ // requestIdleCallback 不支持时降级到 setTimeout
+ const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
+ ILLUS.forEach((src, i) => {
+ ric(() => {
+ const img = new Image();
+ img.decoding = 'async';
+ img.src = src;
+ });
+ });
 }
 
 /* ===================== 音效 ===================== */
@@ -331,7 +304,6 @@ function getAudio() {
  if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
  return audioCtx;
 }
-
 function playShimmer() {
  const ctx = getAudio();
  if (!ctx) return;
@@ -378,14 +350,12 @@ function saveAsImage() {
  ctx.strokeStyle = currentCard.color[0]; ctx.lineWidth = 4;
  drawRoundRect(ctx, m + 12, m + 12, cw - 24, ch - 24, 32); ctx.stroke();
 
- // 顶部品牌
  ctx.fillStyle = 'rgba(91,58,58,0.5)';
  ctx.font = '22px -apple-system, sans-serif';
  ctx.textAlign = 'center';
  ctx.fillText('✦ MOOD · CARD ✦', 360, 130);
 
- // 插画位（用远程图，需要先 drawImage 同步等待）
- const imgUrl = ILLUS[currentCard.illus];
+ const imgUrl = ILLUS[currentCard.illus - 1];
  const img = new Image();
  img.crossOrigin = 'anonymous';
  img.onload = () => {
@@ -399,18 +369,15 @@ function saveAsImage() {
  ctx.strokeStyle = currentCard.color[0]; ctx.lineWidth = 3;
  ctx.stroke();
 
- // 分割线
  ctx.setLineDash([8, 8]);
  ctx.strokeStyle = currentCard.color[0]; ctx.lineWidth = 2;
  ctx.beginPath(); ctx.moveTo(120, 660); ctx.lineTo(600, 660); ctx.stroke();
  ctx.setLineDash([]);
 
- // 寄语
  ctx.fillStyle = '#4a3030';
  ctx.font = '32px -apple-system, "PingFang SC", sans-serif';
  wrapText(ctx, currentCard.message, 360, 760, 540, 50);
 
- // 元信息
  ctx.fillStyle = '#b89090';
  ctx.font = '20px -apple-system, "PingFang SC", sans-serif';
  ctx.textAlign = 'left';
@@ -485,14 +452,12 @@ function onNFCRead({ serialNumber }) {
 
 /* ===================== 事件 ===================== */
 document.getElementById('saveBtn').addEventListener('click', saveAsImage);
-
 function nextCard() {
  getAudio();
  playShimmer();
  const card = pickCard(nfcId);
  renderCard(card, nfcId, false);
 }
-
 document.getElementById('againBtn').addEventListener('click', nextCard);
 document.getElementById('card').addEventListener('click', nextCard);
 
@@ -501,6 +466,8 @@ window.addEventListener('load', () => {
  startNFC();
  const card = pickCard(null);
  renderCard(card, null, false);
+ // 首屏显示后再预热其余图
+ setTimeout(warmup, 100);
 });
 </script>
 </body>
