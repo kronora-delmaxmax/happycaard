@@ -5,545 +5,502 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>心情签 · Mood Card</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    height: 100%;
-    font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(160deg, #fef6e4 0%, #f3d2c1 50%, #f4a3a3 100%);
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .stage {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    padding: 20px;
-  }
-
-  /* 浮动装饰 */
-  .floaty { position: absolute; pointer-events: none; opacity: 0.7; }
-  .floaty.c1 { top: 8%; left: 10%; animation: float 6s ease-in-out infinite; }
-  .floaty.c2 { top: 15%; right: 8%; animation: float 7s ease-in-out infinite reverse; }
-  .floaty.c3 { bottom: 12%; left: 12%; animation: float 8s ease-in-out infinite; }
-  .floaty.c4 { bottom: 18%; right: 10%; animation: float 5s ease-in-out infinite reverse; }
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(5deg); }
-  }
-
-  /* 直接显示结果卡片 - 无翻牌 */
-  .card-wrap {
-    width: 320px;
-    height: 460px;
-    margin: 12px 0;
-  }
-  .card {
-    width: 100%;
-    height: 100%;
-    background: #fffaf0;
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 28px 22px;
-  }
-
-  /* 顶部品牌 */
-  .brand {
-    position: absolute;
-    top: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 13px;
-    letter-spacing: 3px;
-    color: rgba(91, 58, 58, 0.7);
-    font-weight: 300;
-  }
-
-  /* 插画区 - 固定高度 */
-  .illus {
-    width: 140px;
-    height: 140px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .illus svg { width: 100%; height: 100%; }
-
-  /* 分割线 */
-  .divider {
-    width: 60%;
-    height: 1px;
-    background: #e8d5c4;
-    margin: 18px 0;
-    flex-shrink: 0;
-  }
-
-  /* 寄语 - flex 1 占据中间所有空间 */
-  .message {
-    flex: 1;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 18px;
-    line-height: 1.7;
-    color: #4a3030;
-    font-weight: 500;
-    padding: 0 4px;
-    overflow-y: auto;
-  }
-
-  /* 元信息 */
-  .meta {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    color: #b89090;
-    padding-top: 12px;
-    border-top: 1px dashed #e8d5c4;
-    flex-shrink: 0;
-  }
-  .nfc-tag {
-    text-align: center;
-    font-size: 11px;
-    color: #c8a8a8;
-    margin-top: 8px;
-    flex-shrink: 0;
-  }
-
-  /* 操作按钮 */
-  .actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 14px;
-  }
-  .btn {
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(10px);
-    border: none;
-    padding: 11px 22px;
-    border-radius: 30px;
-    font-size: 14px;
-    color: #5b3a3a;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
-    font-family: inherit;
-  }
-  .btn:active { transform: scale(0.96); }
-  .btn.primary { background: #ffd6a5; }
-  .btn .icon { margin-right: 6px; }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(91, 58, 58, 0.9);
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-size: 13px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-    z-index: 100;
-  }
-  .toast.show { opacity: 1; }
-
-  .unsupported {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 14px;
-    background: rgba(255, 214, 165, 0.5);
-    border-radius: 12px;
-    font-size: 12px;
-    color: #8a5a3a;
-    white-space: nowrap;
-  }
-
-  /* 触摸反馈 */
-  @keyframes pulse-in {
-    0% { transform: scale(0.95); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .card {
-    animation: pulse-in 0.5s ease-out;
-  }
+ * { margin:0; padding:0; box-sizing: border-box; }
+ html, body {
+ height:100%;
+ font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+ background: linear-gradient(160deg, #fef6e4 0%, #f3d2c1 50%, #f4a3a3 100%);
+ overflow: hidden;
+ -webkit-tap-highlight-color: transparent;
+ }
+ .stage {
+ position: relative;
+ width:100%;
+ height:100%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ flex-direction: column;
+ padding:20px;
+ }
+ .brand {
+ position: absolute;
+ top:18px;
+ left:50%;
+ transform: translateX(-50%);
+ font-size:13px;
+ letter-spacing:3px;
+ color: rgba(91,58,58,0.7);
+ font-weight:300;
+ }
+ .card-wrap { width:320px; height:480px; margin:8px 0 0 0; }
+ .card {
+ width:100%;
+ height:100%;
+ background: #fffaf0;
+ border-radius:24px;
+ overflow: hidden;
+ box-shadow:0 20px 50px rgba(0,0,0,0.15),0 8px 16px rgba(0,0,0,0.08);
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ padding:24px 22px 20px;
+ animation: pulse-in 0.6s ease-out;
+ position: relative;
+ }
+ /* 插画区 */
+ .illus {
+ width:240px;
+ height:240px;
+ flex-shrink:0;
+ border-radius:18px;
+ overflow: hidden;
+ box-shadow:0 6px 18px rgba(0,0,0,0.08);
+ background: #f8f0e3;
+ position: relative;
+ }
+ .illus img {
+ width:100%;
+ height:100%;
+ object-fit: cover;
+ display: block;
+ transition: opacity 0.4s ease;
+ }
+ .illus.loading::after {
+ content:'';
+ position:absolute;
+ inset:0;
+ background: linear-gradient(90deg, #f0e0d0 25%, #f8f0e3 50%, #f0e0d0 75%);
+ background-size:200% 100%;
+ animation: shimmer 1.4s infinite;
+ }
+ @keyframes shimmer {
+ 0% { background-position:200% 0; }
+ 100% { background-position:-200% 0; }
+ }
+ .divider {
+ width:60%;
+ height:1px;
+ background: #e8d5c4;
+ margin:14px 0 10px;
+ flex-shrink:0;
+ }
+ .message {
+ flex:1;
+ width:100%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ text-align: center;
+ font-size:17px;
+ line-height:1.7;
+ color: #4a3030;
+ font-weight:500;
+ padding:0 4px;
+ }
+ .meta {
+ width:100%;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ font-size:12px;
+ color: #b89090;
+ padding-top:10px;
+ border-top:1px dashed #e8d5c4;
+ flex-shrink:0;
+ }
+ .nfc-tag {
+ text-align: center;
+ font-size:11px;
+ color: #c8a8a8;
+ margin-top:6px;
+ flex-shrink:0;
+ }
+ .actions { display: flex; gap:12px; margin-top:14px; }
+ .btn {
+ background: rgba(255,255,255,0.85);
+ backdrop-filter: blur(10px);
+ border: none;
+ padding:10px 22px;
+ border-radius:30px;
+ font-size:14px;
+ color: #5b3a3a;
+ box-shadow:0 4px 12px rgba(0,0,0,0.08);
+ cursor: pointer;
+ transition: all 0.2s;
+ font-weight:500;
+ font-family: inherit;
+ }
+ .btn:active { transform: scale(0.96); }
+ .btn.primary { background: #ffd6a5; }
+ .btn .icon { margin-right:6px; }
+ .toast {
+ position: fixed; bottom:60px; left:50%;
+ transform: translateX(-50%);
+ background: rgba(91,58,58,0.9); color: #fff;
+ padding:10px 20px; border-radius:20px;
+ font-size:13px; opacity:0;
+ transition: opacity 0.3s; pointer-events: none; z-index:100;
+ }
+ .toast.show { opacity:1; }
+ .unsupported {
+ position: absolute; bottom:12px; left:50%;
+ transform: translateX(-50%);
+ padding:8px 14px;
+ background: rgba(255,214,165,0.5);
+ border-radius:12px; font-size:12px; color: #8a5a3a;
+ white-space: nowrap;
+ }
+ @keyframes pulse-in {
+ 0% { transform: scale(0.95); opacity:0; }
+ 100% { transform: scale(1); opacity:1; }
+ }
+ /* NFC 触发时整卡轻微脉动 */
+ .card.tap-pulse { animation: tap-pulse 0.6s ease-out; }
+ @keyframes tap-pulse {
+ 0% { transform: scale(1); }
+ 50% { transform: scale(1.03); box-shadow:0 24px 60px rgba(244,163,163,0.4),0 10px 20px rgba(0,0,0,0.1); }
+ 100% { transform: scale(1); }
+ }
 </style>
 </head>
 <body>
 
 <div class="stage">
-  <div class="brand">✦ MOOD · CARD ✦</div>
+ <div class="brand">✦ MOOD · CARD ✦</div>
 
-  <svg class="floaty c1" width="60" height="30" viewBox="0 0 60 30">
-    <path d="M5,20 Q15,5 25,18 T45,20 T55,15" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  </svg>
-  <svg class="floaty c2" width="40" height="40" viewBox="0 0 40 40">
-    <circle cx="20" cy="20" r="6" fill="#fff5d6"/>
-    <circle cx="20" cy="20" r="12" fill="none" stroke="#fff5d6" stroke-width="2"/>
-  </svg>
-  <svg class="floaty c3" width="50" height="50" viewBox="0 0 50 50">
-    <path d="M25,5 L30,20 L45,22 L33,32 L37,45 L25,38 L13,45 L17,32 L5,22 L20,20 Z" fill="#fff5d6" opacity="0.8"/>
-  </svg>
-  <svg class="floaty c4" width="50" height="30" viewBox="0 0 50 30">
-    <path d="M10,20 Q20,5 30,20 Q40,35 50,20" stroke="#fff" stroke-width="2" fill="none"/>
-    <path d="M10,25 Q20,10 30,25 Q40,40 50,25" stroke="#fff" stroke-width="2" fill="none" opacity="0.6"/>
-  </svg>
+ <div class="card-wrap">
+ <div class="card" id="card">
+ <div class="illus loading" id="illus"><img id="illusImg" alt=""></div>
+ <div class="divider"></div>
+ <div class="message" id="message">—</div>
+ <div class="meta">
+ <span id="cardNo">№ —</span>
+ <span id="cardDate">—</span>
+ </div>
+ <div class="nfc-tag" id="nfcTag">今日抽取</div>
+ </div>
+ </div>
 
-  <!-- 直接显示结果卡片，没有翻牌 -->
-  <div class="card-wrap">
-    <div class="card" id="card">
-      <div class="illus" id="illus"></div>
-      <div class="divider"></div>
-      <div class="message" id="message">—</div>
-      <div class="meta">
-        <span id="cardNo">№ —</span>
-        <span id="cardDate">—</span>
-      </div>
-      <div class="nfc-tag" id="nfcTag">今日抽取</div>
-    </div>
-  </div>
+ <div class="actions">
+ <button class="btn primary" id="againBtn"><span class="icon">🔄</span>换一张</button>
+ <button class="btn" id="saveBtn"><span class="icon">💾</span>保存图片</button>
+ </div>
 
-  <div class="actions">
-    <button class="btn primary" id="againBtn">
-      <span class="icon">🔄</span>换一张
-    </button>
-    <button class="btn" id="saveBtn">
-      <span class="icon">💾</span>保存图片
-    </button>
-  </div>
-
-  <div class="unsupported" id="unsupported" style="display:none">
-    当前浏览器不支持 Web NFC，请用 Android Chrome 打开
-  </div>
+ <div class="unsupported" id="unsupported" style="display:none">
+ 当前浏览器不支持 Web NFC，请用 Android Chrome 打开
+ </div>
 </div>
 
 <div class="toast" id="toast">已保存</div>
 
 <script>
-// ===================== 心情签数据 =====================
+/* =====================================================
+ * 30 张 Ji Yong Park 风格插画（CDN 公开地址）
+ * 主题分类：喜悦5 / 治愈5 / 力量5 / 哲思5 / 趣味5 / 静谧5
+ * ===================================================== */
+const ILLUS = {
+ // 喜悦
+ 1:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079320_797d23ac.png",
+ 2:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079324_b16b9816.png",
+ 3:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079321_bd8e0eed.png",
+ 4:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079361_ed43827f.png",
+ 5:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079366_ddfec3b9.png",
+ // 治愈
+ 6:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079373_6216110d.png",
+ 7:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079396_958bf189.png",
+ 8:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079406_20e5af90.png",
+ 9:  "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079408_c25713f1.png",
+ 10: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079439_d68893d4.png",
+ // 力量
+ 11: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079511_3ff39778.png",
+ 12: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079507_00954e2f.png",
+ 13: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079509_585afc86.png",
+ 14: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079542_33ad64f5.png",
+ 15: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079548_4b62695d.png",
+ // 哲思
+ 16: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079550_f46e76be.png",
+ 17: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079586_6445678d.png",
+ 18: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079589_15af26d3.png",
+ 19: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079604_6025f807.png",
+ 20: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079622_52c6783c.png",
+ // 趣味
+ 21: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079696_e5ae43ef.png",
+ 22: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079698_f0db5984.png",
+ 23: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079697_2c85760a.png",
+ 24: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079733_4a3aefd0.png",
+ 25: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079734_09e0a6ab.png",
+ // 静谧
+ 26: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079754_e5c62b75.png",
+ 27: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079769_7304471e.png",
+ 28: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079773_4d32b05e.png",
+ 29: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079796_3b39062e.png",
+ 30: "https://cdn.hailuoai.com/mcp/u486178057165996038/image_tool/output/1781079818_0e357a54.png",
+};
+
+/* =====================================================
+ * 20 张心情签数据（每张配 1 张精选插画）
+ * ===================================================== */
 const MOODS = [
-  { id: 1,  color: ['#ffd6a5','#fff5d6'], icon: '☀️', message: '今天的你，像清晨第一缕光，刚刚好。', category: '喜悦' },
-  { id: 2,  color: ['#ffe5b4','#fff0d0'], icon: '🌻', message: '开心不用理由，笑出声就对了。', category: '喜悦' },
-  { id: 3,  color: ['#ffc4c4','#ffe0e0'], icon: '🍓', message: '生活的甜，藏在每一个细小的瞬间。', category: '喜悦' },
-  { id: 4,  color: ['#c4e8d4','#e0f5e8'], icon: '🌱', message: '小小的满足，是今天最好的礼物。', category: '喜悦' },
-  { id: 5,  color: ['#d4c4e8','#e8dcf5'], icon: '🌸', message: '慢一点也没关系，花会慢慢开。', category: '治愈' },
-  { id: 6,  color: ['#c4d8e8','#dce8f5'], icon: '☁️', message: '允许自己什么都不做，也是一种勇敢。', category: '治愈' },
-  { id: 7,  color: ['#f5d4c4','#fce0d4'], icon: '🍑', message: '累了就停下来，世界不会因为你休息就崩塌。', category: '治愈' },
-  { id: 8,  color: ['#e8d4c4','#f5e0d4'], icon: '🍯', message: '温柔待自己，像蜂蜜慢慢淌进热茶。', category: '治愈' },
-  { id: 9,  color: ['#e8c4a8','#f5dcc8'], icon: '🌅', message: '你比自己以为的，要坚韧得多。', category: '力量' },
-  { id: 10, color: ['#a8c4e8','#c8dcf5'], icon: '🌊', message: '潮起潮落都是风景，你只管向前。', category: '力量' },
-  { id: 11, color: ['#c4e8a8','#dcf5c8'], icon: '🌿', message: '根扎得深，才不怕风来。', category: '力量' },
-  { id: 12, color: ['#e8a8c4','#f5c8dc'], icon: '🌷', message: '不必长成玫瑰，做你自己的花就好。', category: '力量' },
-  { id: 13, color: ['#d4e8c4','#e8f5d4'], icon: '🍃', message: '风的方向不重要，重要的是你站得稳。', category: '哲思' },
-  { id: 14, color: ['#c4c4e8','#dcdcf5'], icon: '🌙', message: '夜再长，也会被清晨替换。', category: '哲思' },
-  { id: 15, color: ['#e8e8c4','#f5f5d4'], icon: '⭐', message: '不必照亮所有人，做自己的光。', category: '哲思' },
-  { id: 16, color: ['#a8e8e8','#c8f5f5'], icon: '💧', message: '水滴石穿，靠的是持续，不是力度。', category: '哲思' },
-  { id: 17, color: ['#ffd4e8','#ffe0f0'], icon: '🍰', message: '今天的事，今天的蛋糕，明天的事明天再说。', category: '趣味' },
-  { id: 18, color: ['#e8d4ff','#f0e0ff'], icon: '🦋', message: '发呆也是一种正经事。', category: '趣味' },
-  { id: 19, color: ['#d4ffe8','#e0fff0'], icon: '🍀', message: '好运在来的路上，可能就在下一个转角。', category: '趣味' },
-  { id: 20, color: ['#ffe8d4','#fff0e0'], icon: '🥐', message: '像刚出炉的可颂，外酥里嫩地活着。', category: '趣味' },
+ { id:1,  illus:1,  color:['#ffd6a5','#fff5d6'], message:'今天的你，像清晨第一缕光，刚刚好。', category:'喜悦' },
+ { id:2,  illus:5,  color:['#ffe5b4','#fff0d0'], message:'开心不用理由，笑出声就对了。', category:'喜悦' },
+ { id:3,  illus:4,  color:['#ffc4c4','#ffe0e0'], message:'生活的甜，藏在每一个细小的瞬间。', category:'喜悦' },
+ { id:4,  illus:2,  color:['#c4e8d4','#e0f5e8'], message:'小小的满足，是今天最好的礼物。', category:'喜悦' },
+ { id:5,  illus:5,  color:['#d4c4e8','#e8dcf5'], message:'慢一点也没关系，花会慢慢开。', category:'治愈' },
+ { id:6,  illus:6,  color:['#c4d8e8','#dce8f5'], message:'允许自己什么都不做，也是一种勇敢。', category:'治愈' },
+ { id:7,  illus:7,  color:['#f5d4c4','#fce0d4'], message:'累了就停下来，世界不会因为你休息就崩塌。', category:'治愈' },
+ { id:8,  illus:8,  color:['#e8d4c4','#f5e0d4'], message:'温柔待自己，像蜂蜜慢慢淌进热茶。', category:'治愈' },
+ { id:9,  illus:26, color:['#e8c4a8','#f5dcc8'], message:'你比自己以为的，要坚韧得多。', category:'力量' },
+ { id:10, illus:18, color:['#a8c4e8','#c8dcf5'], message:'潮起潮落都是风景，你只管向前。', category:'力量' },
+ { id:11, illus:11, color:['#c4e8a8','#dcf5c8'], message:'根扎得深，才不怕风来。', category:'力量' },
+ { id:12, illus:12, color:['#e8a8c4','#f5c8dc'], message:'不必长成玫瑰，做你自己的花就好。', category:'力量' },
+ { id:13, illus:13, color:['#d4e8c4','#e8f5d4'], message:'风的方向不重要，重要的是你站得稳。', category:'哲思' },
+ { id:14, illus:8,  color:['#c4c4e8','#dcdcf5'], message:'夜再长，也会被清晨替换。', category:'哲思' },
+ { id:15, illus:15, color:['#e8e8c4','#f5f5d4'], message:'不必照亮所有人，做自己的光。', category:'哲思' },
+ { id:16, illus:19, color:['#a8e8e8','#c8f5f5'], message:'水滴石穿，靠的是持续，不是力度。', category:'哲思' },
+ { id:17, illus:24, color:['#ffd4e8','#ffe0f0'], message:'今天的事，今天的蛋糕，明天的事明天再说。', category:'趣味' },
+ { id:18, illus:21, color:['#e8d4ff','#f0e0ff'], message:'发呆也是一种正经事。', category:'趣味' },
+ { id:19, illus:23, color:['#d4ffe8','#e0fff0'], message:'好运在来的路上，可能就在下一个转角。', category:'趣味' },
+ { id:20, illus:22, color:['#ffe8d4','#fff0e0'], message:'像刚出炉的可颂，外酥里嫩地活着。', category:'趣味' },
 ];
 
-// 清新系插画 SVG（无 emoji 依赖，4 种风格）
-function makeIllus(mood) {
-  const c1 = mood.color[0], c2 = mood.color[1];
-  const icon = mood.icon;
-  const styles = [
-    `<svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="g${mood.id}" cx="50%" cy="50%">
-          <stop offset="0%" stop-color="${c2}"/>
-          <stop offset="100%" stop-color="${c1}"/>
-        </radialGradient>
-      </defs>
-      <circle cx="70" cy="70" r="55" fill="url(#g${mood.id})" opacity="0.6"/>
-      <circle cx="70" cy="70" r="40" fill="${c2}"/>
-      <text x="70" y="88" text-anchor="middle" font-size="44">${icon}</text>
-      <circle cx="28" cy="38" r="4" fill="${c1}" opacity="0.7"/>
-      <circle cx="112" cy="98" r="6" fill="${c1}" opacity="0.6"/>
-      <circle cx="22" cy="104" r="3" fill="${c1}" opacity="0.5"/>
-      <circle cx="118" cy="30" r="4" fill="${c1}" opacity="0.7"/>
-    </svg>`,
-    `<svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
-      <g transform="translate(70,70)">
-        <ellipse cx="0" cy="-32" rx="16" ry="28" fill="${c1}" opacity="0.8"/>
-        <ellipse cx="30" cy="-10" rx="16" ry="28" fill="${c1}" opacity="0.8" transform="rotate(72)"/>
-        <ellipse cx="19" cy="26" rx="16" ry="28" fill="${c1}" opacity="0.8" transform="rotate(144)"/>
-        <ellipse cx="-19" cy="26" rx="16" ry="28" fill="${c1}" opacity="0.8" transform="rotate(216)"/>
-        <ellipse cx="-30" cy="-10" rx="16" ry="28" fill="${c1}" opacity="0.8" transform="rotate(288)"/>
-        <circle cx="0" cy="0" r="16" fill="${c2}"/>
-        <text x="0" y="7" text-anchor="middle" font-size="18">${icon}</text>
-      </g>
-    </svg>`,
-    `<svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="108" cy="38" r="22" fill="${c1}" opacity="0.8"/>
-      <text x="108" y="48" text-anchor="middle" font-size="18">${icon}</text>
-      <path d="M0,108 Q32,70 64,92 T140,86 L140,140 L0,140 Z" fill="${c1}" opacity="0.6"/>
-      <path d="M0,124 Q40,100 80,116 T140,112 L140,140 L0,140 Z" fill="${c1}" opacity="0.9"/>
-      <ellipse cx="30" cy="44" rx="18" ry="6" fill="${c2}" opacity="0.7"/>
-      <ellipse cx="70" cy="28" rx="14" ry="5" fill="${c2}" opacity="0.6"/>
-    </svg>`,
-    `<svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="46" cy="54" r="30" fill="${c1}" opacity="0.7"/>
-      <circle cx="94" cy="78" r="38" fill="${c2}" opacity="0.7"/>
-      <circle cx="40" cy="100" r="22" fill="${c1}" opacity="0.5"/>
-      <text x="70" y="84" text-anchor="middle" font-size="36">${icon}</text>
-    </svg>`,
-  ];
-  return styles[mood.id % styles.length];
-}
-
-// ===================== 抽签逻辑 =====================
 let currentCard = null;
 let ndefReader = null;
 let nfcId = null;
+let isFirstRender = true;
 
 function hashCode(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash;
+ let hash = 0;
+ for (let i = 0; i < str.length; i++) {
+ hash = ((hash << 5) - hash) + str.charCodeAt(i);
+ hash |= 0;
+ }
+ return hash;
 }
 
 function pickCard(seedId) {
-  if (seedId) {
-    return MOODS[Math.abs(hashCode(seedId)) % MOODS.length];
-  }
-  return MOODS[Math.floor(Math.random() * MOODS.length)];
+ if (seedId) return MOODS[Math.abs(hashCode(seedId)) % MOODS.length];
+ return MOODS[Math.floor(Math.random() * MOODS.length)];
 }
 
 function formatDate(d) {
-  const m = d.getMonth() + 1;
-  const day = d.getDate();
-  const h = d.getHours();
-  const min = d.getMinutes();
-  return `${m}月${day}日 ${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+ const m = d.getMonth() + 1, day = d.getDate();
+ const h = d.getHours(), min = d.getMinutes();
+ return `${m}月${day}日 ${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
 }
 
-function renderCard(card, seedId) {
-  currentCard = card;
-  nfcId = seedId;
-  document.getElementById('illus').innerHTML = makeIllus(card);
-  document.getElementById('message').textContent = card.message;
-  document.getElementById('cardNo').textContent = '№ ' + String(card.id).padStart(3, '0');
-  document.getElementById('cardDate').textContent = formatDate(new Date());
-  document.getElementById('nfcTag').textContent = seedId ? `NFC · ${seedId.slice(0, 8)}` : '今日抽取';
+function renderCard(card, seedId, withTapPulse) {
+ currentCard = card;
+ nfcId = seedId;
 
-  // 重新触发动画
-  const cardEl = document.getElementById('card');
-  cardEl.style.animation = 'none';
-  cardEl.offsetHeight;
-  cardEl.style.animation = 'pulse-in 0.5s ease-out';
+ const img = document.getElementById('illusImg');
+ const illus = document.getElementById('illus');
+ illus.classList.add('loading');
+ img.style.opacity = '0';
+ img.src = ILLUS[card.illus];
+ img.onload = () => {
+ img.style.opacity = '1';
+ illus.classList.remove('loading');
+ };
+ img.onerror = () => {
+ illus.classList.remove('loading');
+ img.style.opacity = '1';
+ };
+
+ document.getElementById('message').textContent = card.message;
+ document.getElementById('cardNo').textContent = '№ ' + String(card.id).padStart(3, '0');
+ document.getElementById('cardDate').textContent = formatDate(new Date());
+ document.getElementById('nfcTag').textContent = seedId ? `NFC · ${seedId.slice(0,8)}` : '今日抽取';
+
+ const cardEl = document.getElementById('card');
+ if (withTapPulse) {
+ cardEl.classList.remove('tap-pulse');
+ void cardEl.offsetWidth;
+ cardEl.classList.add('tap-pulse');
+ } else if (isFirstRender) {
+ cardEl.style.animation = 'none';
+ void cardEl.offsetWidth;
+ cardEl.style.animation = 'pulse-in 0.6s ease-out';
+ isFirstRender = false;
+ }
 }
 
-// ===================== 音效 =====================
+/* ===================== 音效 ===================== */
 let audioCtx = null;
 function getAudio() {
-  if (!audioCtx) {
-    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
-  }
-  return audioCtx;
+ if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
+ return audioCtx;
 }
 
 function playShimmer() {
-  const ctx = getAudio();
-  if (!ctx) return;
-  const now = ctx.currentTime;
-  for (let i = 0; i < 5; i++) {
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    const freq = 1200 + Math.random() * 800;
-    o.frequency.setValueAtTime(freq, now + i * 0.05);
-    g.gain.setValueAtTime(0.05, now + i * 0.05);
-    g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.3);
-    o.connect(g).connect(ctx.destination);
-    o.start(now + i * 0.05);
-    o.stop(now + i * 0.05 + 0.3);
-  }
+ const ctx = getAudio();
+ if (!ctx) return;
+ const now = ctx.currentTime;
+ for (let i = 0; i < 5; i++) {
+ const o = ctx.createOscillator();
+ const g = ctx.createGain();
+ o.type = 'sine';
+ const freq = 1200 + Math.random() * 800;
+ o.frequency.setValueAtTime(freq, now + i * 0.05);
+ g.gain.setValueAtTime(0.05, now + i * 0.05);
+ g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.3);
+ o.connect(g).connect(ctx.destination);
+ o.start(now + i * 0.05);
+ o.stop(now + i * 0.05 + 0.3);
+ }
 }
 
-// ===================== Toast =====================
+/* ===================== Toast ===================== */
 function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1500);
+ const t = document.getElementById('toast');
+ t.textContent = msg;
+ t.classList.add('show');
+ setTimeout(() => t.classList.remove('show'), 1500);
 }
 
-// ===================== 保存图片 =====================
+/* ===================== 保存图片 ===================== */
 function saveAsImage() {
-  if (!currentCard) return;
-  const canvas = document.createElement('canvas');
-  canvas.width = 720;
-  canvas.height = 1080;
-  const ctx = canvas.getContext('2d');
+ if (!currentCard) return;
+ const canvas = document.createElement('canvas');
+ canvas.width = 720;
+ canvas.height = 1080;
+ const ctx = canvas.getContext('2d');
 
-  const grad = ctx.createLinearGradient(0, 0, 720, 1080);
-  grad.addColorStop(0, currentCard.color[1]);
-  grad.addColorStop(1, currentCard.color[0]);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 720, 1080);
+ const grad = ctx.createLinearGradient(0, 0, 720, 1080);
+ grad.addColorStop(0, currentCard.color[1]);
+ grad.addColorStop(1, currentCard.color[0]);
+ ctx.fillStyle = grad;
+ ctx.fillRect(0, 0, 720, 1080);
 
-  const m = 40, cw = 720 - m * 2, ch = 1080 - m * 2;
-  drawRoundRect(ctx, m, m, cw, ch, 40);
-  ctx.fillStyle = '#fffaf0';
-  ctx.fill();
-  ctx.strokeStyle = currentCard.color[0];
-  ctx.lineWidth = 4;
-  drawRoundRect(ctx, m + 12, m + 12, cw - 24, ch - 24, 32);
-  ctx.stroke();
+ const m = 40, cw = 720 - m * 2, ch = 1080 - m * 2;
+ ctx.fillStyle = '#fffaf0';
+ drawRoundRect(ctx, m, m, cw, ch, 40); ctx.fill();
+ ctx.strokeStyle = currentCard.color[0]; ctx.lineWidth = 4;
+ drawRoundRect(ctx, m + 12, m + 12, cw - 24, ch - 24, 32); ctx.stroke();
 
-  // 顶部品牌
-  ctx.fillStyle = 'rgba(91,58,58,0.5)';
-  ctx.font = '22px -apple-system, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('✦ MOOD · CARD ✦', 360, 130);
+ // 顶部品牌
+ ctx.fillStyle = 'rgba(91,58,58,0.5)';
+ ctx.font = '22px -apple-system, sans-serif';
+ ctx.textAlign = 'center';
+ ctx.fillText('✦ MOOD · CARD ✦', 360, 130);
 
-  // 插画
-  ctx.fillStyle = currentCard.color[0];
-  ctx.beginPath();
-  ctx.arc(360, 280, 70, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = currentCard.color[1];
-  ctx.beginPath();
-  ctx.arc(360, 280, 48, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.font = '54px serif';
-  ctx.fillText(currentCard.icon, 360, 302);
+ // 插画位（用远程图，需要先 drawImage 同步等待）
+ const imgUrl = ILLUS[currentCard.illus];
+ const img = new Image();
+ img.crossOrigin = 'anonymous';
+ img.onload = () => {
+ const ix = 360 - 200, iy = 200;
+ drawRoundRect(ctx, ix, iy, 400, 400, 24);
+ ctx.save();
+ ctx.clip();
+ ctx.drawImage(img, ix, iy, 400, 400);
+ ctx.restore();
+ drawRoundRect(ctx, ix, iy, 400, 400, 24);
+ ctx.strokeStyle = currentCard.color[0]; ctx.lineWidth = 3;
+ ctx.stroke();
 
-  // 分割线
-  ctx.strokeStyle = currentCard.color[0];
-  ctx.lineWidth = 2;
-  ctx.setLineDash([8, 8]);
-  ctx.beginPath();
-  ctx.moveTo(120, 440);
-  ctx.lineTo(600, 440);
-  ctx.stroke();
-  ctx.setLineDash([]);
+ // 分割线
+ ctx.setLineDash([8, 8]);
+ ctx.strokeStyle = currentCard.color[0]; ctx.lineWidth = 2;
+ ctx.beginPath(); ctx.moveTo(120, 660); ctx.lineTo(600, 660); ctx.stroke();
+ ctx.setLineDash([]);
 
-  // 寄语
-  ctx.fillStyle = '#4a3030';
-  ctx.font = '32px -apple-system, "PingFang SC", sans-serif';
-  wrapText(ctx, currentCard.message, 360, 540, 540, 50);
+ // 寄语
+ ctx.fillStyle = '#4a3030';
+ ctx.font = '32px -apple-system, "PingFang SC", sans-serif';
+ wrapText(ctx, currentCard.message, 360, 760, 540, 50);
 
-  // 元信息
-  ctx.fillStyle = '#b89090';
-  ctx.font = '20px -apple-system, "PingFang SC", sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('№ ' + String(currentCard.id).padStart(3, '0'), 100, 920);
-  ctx.textAlign = 'right';
-  ctx.fillText(formatDate(new Date()), 620, 920);
+ // 元信息
+ ctx.fillStyle = '#b89090';
+ ctx.font = '20px -apple-system, "PingFang SC", sans-serif';
+ ctx.textAlign = 'left';
+ ctx.fillText('№ ' + String(currentCard.id).padStart(3, '0'), 100, 990);
+ ctx.textAlign = 'right';
+ ctx.fillText(formatDate(new Date()), 620, 990);
 
-  canvas.toBlob(blob => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `心情签-${currentCard.id}-${Date.now()}.png`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    toast('已保存到下载');
-  }, 'image/png');
+ canvas.toBlob(blob => {
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `心情签-${currentCard.id}-${Date.now()}.png`;
+ a.click();
+ setTimeout(() => URL.revokeObjectURL(url), 1000);
+ toast('已保存到下载');
+ }, 'image/png');
+ };
+ img.onerror = () => toast('插画加载失败，请稍后再试');
+ img.src = imgUrl;
 }
 
 function drawRoundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.arcTo(x + w, y, x + w, y + r, r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-  ctx.lineTo(x + r, y + h);
-  ctx.arcTo(x, y + h, x, y + h - r, r);
-  ctx.lineTo(x, y + r);
-  ctx.arcTo(x, y, x + r, y, r);
-  ctx.closePath();
+ ctx.beginPath();
+ ctx.moveTo(x + r, y);
+ ctx.lineTo(x + w - r, y);
+ ctx.arcTo(x + w, y, x + w, y + r, r);
+ ctx.lineTo(x + w, y + h - r);
+ ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+ ctx.lineTo(x + r, y + h);
+ ctx.arcTo(x, y + h, x, y + h - r, r);
+ ctx.lineTo(x, y + r);
+ ctx.arcTo(x, y, x + r, y, r);
+ ctx.closePath();
 }
 
 function wrapText(ctx, text, x, y, maxW, lineH) {
-  const chars = text.split('');
-  let line = '';
-  let yy = y;
-  for (let i = 0; i < chars.length; i++) {
-    const test = line + chars[i];
-    if (ctx.measureText(test).width > maxW && line.length > 0) {
-      ctx.fillText(line, x, yy);
-      line = chars[i];
-      yy += lineH;
-    } else {
-      line = test;
-    }
-  }
-  if (line) ctx.fillText(line, x, yy);
+ const chars = text.split('');
+ let line = '', yy = y;
+ for (let i = 0; i < chars.length; i++) {
+ const test = line + chars[i];
+ if (ctx.measureText(test).width > maxW && line.length > 0) {
+ ctx.fillText(line, x, yy);
+ line = chars[i]; yy += lineH;
+ } else { line = test; }
+ }
+ if (line) ctx.fillText(line, x, yy);
 }
 
-// ===================== NFC =====================
+/* ===================== NFC ===================== */
 async function startNFC() {
-  if (!('NDEFReader' in window)) {
-    document.getElementById('unsupported').style.display = 'block';
-    return;
-  }
-  try {
-    ndefReader = new NDEFReader();
-    await ndefReader.scan();
-    ndefReader.addEventListener('reading', onNFCRead);
-  } catch (e) {
-    console.log('NFC 启动失败:', e.message);
-  }
+ if (!('NDEFReader' in window)) {
+ document.getElementById('unsupported').style.display = 'block';
+ return;
+ }
+ try {
+ ndefReader = new NDEFReader();
+ await ndefReader.scan();
+ ndefReader.addEventListener('reading', onNFCRead);
+ } catch (e) {
+ console.log('NFC 启动失败:', e.message);
+ }
 }
 
 function onNFCRead({ serialNumber }) {
-  const seedId = serialNumber || ('nfc-' + Date.now());
-  getAudio();
-  const card = pickCard(seedId);
-  renderCard(card, seedId);
-  playShimmer();
-  if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+ const seedId = serialNumber || ('nfc-' + Date.now());
+ getAudio();
+ const card = pickCard(seedId);
+ renderCard(card, seedId, true);
+ playShimmer();
+ if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 }
 
-// ===================== 事件 =====================
+/* ===================== 事件 ===================== */
 document.getElementById('saveBtn').addEventListener('click', saveAsImage);
-document.getElementById('againBtn').addEventListener('click', () => {
-  getAudio();
-  playShimmer();
-  const card = pickCard(nfcId);
-  renderCard(card, nfcId);
-});
 
-// 点卡片本身换一张
-document.getElementById('card').addEventListener('click', () => {
-  getAudio();
-  playShimmer();
-  const card = pickCard(nfcId);
-  renderCard(card, nfcId);
-});
+function nextCard() {
+ getAudio();
+ playShimmer();
+ const card = pickCard(nfcId);
+ renderCard(card, nfcId, false);
+}
 
-// ===================== 启动：直接显示一张随机卡 =====================
+document.getElementById('againBtn').addEventListener('click', nextCard);
+document.getElementById('card').addEventListener('click', nextCard);
+
+/* ===================== 启动 ===================== */
 window.addEventListener('load', () => {
-  startNFC();
-  // 立即显示一张随机卡（没有封面/等待页）
-  const card = pickCard(null);
-  renderCard(card, null);
+ startNFC();
+ const card = pickCard(null);
+ renderCard(card, null, false);
 });
 </script>
 </body>
