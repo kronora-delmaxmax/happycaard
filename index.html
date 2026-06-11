@@ -190,12 +190,14 @@
 
 <script>
 /* =====================================================
- * 30 张本地压缩插画（600px JPEG，~140KB/张，总 4.2MB）
- * 路径：images/illus-01.jpg ~ images/illus-30.jpg
+ * 39 张本地压缩插画（600px JPEG，~140KB/张）
+ * 路径：images/illus-01.jpg ~ images/illus-39.jpg
+ * 1-30: 厚涂油画场景
+ * 31-39: 浅笔触+低饱和度风景（v3 风格）
  * GitHub Pages 同源 + 浏览器 HTTP 缓存 + 预热，切卡秒切
  * ===================================================== */
 const ILLUS = [];
-for (let i = 1; i <= 30; i++) {
+for (let i = 1; i <= 39; i++) {
  ILLUS.push(`images/illus-${String(i).padStart(2,'0')}.jpg`);
 }
 
@@ -223,6 +225,11 @@ const MOODS = [
  { id:18, illus:21, color:['#e8d4ff','#f0e0ff'], message:'发呆也是一种正经事。', category:'趣味' },
  { id:19, illus:23, color:['#d4ffe8','#e0fff0'], message:'好运在来的路上，可能就在下一个转角。', category:'趣味' },
  { id:20, illus:22, color:['#ffe8d4','#fff0e0'], message:'像刚出炉的可颂，外酥里嫩地活着。', category:'趣味' },
+ { id:21, illus:31, color:['#e8e0d4','#f0e8dc'], message:'走过的路，每一段都算数。', category:'治愈' },
+ { id:22, illus:33, color:['#c8d8c0','#dce8d4'], message:'心里有光，路就不远。', category:'治愈' },
+ { id:23, illus:35, color:['#a8c4d4','#c4dce8'], message:'浪来千百次，礁石还在这里。', category:'力量' },
+ { id:24, illus:38, color:['#c0c4c8','#d4d8dc'], message:'阴天不是缺晴，是云在给自己放假。', category:'哲思' },
+ { id:25, illus:36, color:['#d4e0e8','#dce8f0'], message:'像远帆一样，自在地飘一飘。', category:'趣味' },
 ];
 
 let currentCard = null;
